@@ -1,5 +1,15 @@
 
 
+## Server Requirements
+
+* git
+* go
+
+### GO bin config
+
+```bash
+
+```
 
 ## Secure SFTP Batch Get
 
