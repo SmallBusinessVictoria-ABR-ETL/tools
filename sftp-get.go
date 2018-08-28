@@ -2,6 +2,7 @@ package tools
 
 import (
 	"fmt"
+	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/kms"
 	"github.com/pkg/sftp"
@@ -13,7 +14,7 @@ import (
 
 func SFTPGet(file, localFileName string) {
 
-	keys := kms.New(session.Must(session.NewSession()))
+	keys := kms.New(session.Must(session.NewSession(&aws.Config{Region: aws.String(os.Getenv("AWS_REGION_KMS"))})))
 
 	userDec, err := keys.Decrypt(&kms.DecryptInput{
 		CiphertextBlob: []byte(os.Getenv("SFTP_USER_ENC")),
