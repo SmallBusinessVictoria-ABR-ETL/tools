@@ -3,9 +3,14 @@ package main
 import (
 	"fmt"
 	"github.com/SmallBusinessVictoria-ABR-ETL/tools"
+	"log"
 	"os"
 )
 
 func main() {
-	fmt.Print(tools.Decrypt(os.Args[1]))
+	plain, err := tools.Decrypt(os.Args[1])
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Print(plain)
 }
