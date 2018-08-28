@@ -1,10 +1,16 @@
 
+## Dev Requirements
+
+ * IAM Role with access to:
+   * KMS:Encrypt (credentials)
+ * 
 
 ## Server Requirements
 
  * git
  * go
  * Ubuntu Ec2 Instance
+   * Elastic IP whitelists with ATO
  * EC2 Role with access to:
    * KMS:Decrypt (credentials)
    * KMS:Encrypt (data)
@@ -26,6 +32,13 @@ export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin
 
 ```bash
 go get -u github.com/SmallBusinessVictoria-ABR-ETL/tools
+```
+
+## Encrypt username and passwords
+
+```bash
+aws --region ap-southeast-2 kms list-keys
+aws --region ap-southeast-2 kms encrypt --key-id <key-id> --plaintext <username or password>
 ```
 
 ## Secure SFTP Batch Get
