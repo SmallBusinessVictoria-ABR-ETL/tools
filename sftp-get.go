@@ -2,9 +2,6 @@ package tools
 
 import (
 	"fmt"
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/kms"
 	"github.com/pkg/sftp"
 	"golang.org/x/crypto/ssh"
 	"io"
@@ -14,17 +11,11 @@ import (
 
 func SFTPGet(file, localFileName string) {
 
-	keys := kms.New(session.Must(session.NewSession(&aws.Config{Region: aws.String(os.Getenv("AWS_REGION_KMS"))})))
-
-	userDec, err := keys.Decrypt(&kms.DecryptInput{
-		CiphertextBlob: []byte(os.Getenv("SFTP_USER_ENC")),
-	})
+	username, err := Decrypt(os.Getenv("SFTP_USER_ENC"))
 	if err != nil {
 		log.Fatal("Failed to decrypt SFTP_USER_ENC")
 	}
-	passDec, err := keys.Decrypt(&kms.DecryptInput{
-		CiphertextBlob: []byte(os.Getenv("SFTP_PASS_ENC")),
-	})
+	password, err := Decrypt(os.Getenv("SFTP_PASS_ENC"))
 	if err != nil {
 		log.Fatal("Failed to decrypt SFTP_PASS_ENC")
 	}
@@ -32,8 +23,8 @@ func SFTPGet(file, localFileName string) {
 	var sshClient *ssh.Client
 
 	config := ssh.ClientConfig{
-		User:            string(userDec.Plaintext),
-		Auth:            []ssh.AuthMethod{ssh.Password(string(passDec.Plaintext))},
+		User:            username,
+		Auth:            []ssh.AuthMethod{ssh.Password(password)},
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 	}
 	addr := fmt.Sprintf("%s:%d", os.Getenv("SFTP_HOST"), os.Getenv("SFTP_PORT"))

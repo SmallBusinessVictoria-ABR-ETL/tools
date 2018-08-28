@@ -21,10 +21,10 @@ export GOPATH=$HOME/go
 export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin
 ```
 
-## Install
+## Install/Update
 
 ```bash
-go get github.com/SmallBusinessVictoria-ABR-ETL/tools
+go get -u github.com/SmallBusinessVictoria-ABR-ETL/tools
 ```
 
 ## Secure SFTP Batch Get
