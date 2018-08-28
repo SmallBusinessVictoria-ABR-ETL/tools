@@ -40,3 +40,5 @@ export AWS_REGION=ap-southeast-2
 
 sftp-get "AllStates_ABR Data/Sent/VIC_ABR Extract.zip" "`date +%Y%m%d`-VIC_ABR_Extract.zip"
 ```
+
+
