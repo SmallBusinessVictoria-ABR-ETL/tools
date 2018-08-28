@@ -1,4 +1,4 @@
-package sbv_abr_etl
+package tools
 
 //func main() {
 //	sess := session.Must(session.NewSession())

@@ -1,10 +1,10 @@
 package main
 
 import (
-	"bitbucket.org/portable/sbv-abr-etl"
+	"github.com/SmallBusinessVictoria-ABR-ETL/tools"
 	"os"
 )
 
-func main()  {
-	sbv_abr_etl.SFTPGet(os.Args[1], os.Args[2])
+func main() {
+	tools.SFTPGet(os.Args[1], os.Args[2])
 }

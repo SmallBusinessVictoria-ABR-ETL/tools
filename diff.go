@@ -1,4 +1,4 @@
-package sbv_abr_etl
+package tools
 
 import (
 	"bufio"

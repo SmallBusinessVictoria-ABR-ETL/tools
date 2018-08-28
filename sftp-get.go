@@ -1,28 +1,28 @@
-package sbv_abr_etl
+package tools
 
 import (
+	"fmt"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/kms"
 	"github.com/pkg/sftp"
 	"golang.org/x/crypto/ssh"
-	"log"
-	"fmt"
-	"github.com/aws/aws-sdk-go/service/kms"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"os"
 	"io"
+	"log"
+	"os"
 )
 
 func SFTPGet(file, localFileName string) {
 
 	keys := kms.New(session.Must(session.NewSession()))
 
-	userDec,err := keys.Decrypt(&kms.DecryptInput{
-		CiphertextBlob:[]byte(os.Getenv("SFTP_USER_ENC")),
+	userDec, err := keys.Decrypt(&kms.DecryptInput{
+		CiphertextBlob: []byte(os.Getenv("SFTP_USER_ENC")),
 	})
 	if err != nil {
 		log.Fatal("Failed to decrypt SFTP_USER_ENC")
 	}
-	passDec,err := keys.Decrypt(&kms.DecryptInput{
-		CiphertextBlob:[]byte(os.Getenv("SFTP_PASS_ENC")),
+	passDec, err := keys.Decrypt(&kms.DecryptInput{
+		CiphertextBlob: []byte(os.Getenv("SFTP_PASS_ENC")),
 	})
 	if err != nil {
 		log.Fatal("Failed to decrypt SFTP_PASS_ENC")
@@ -31,8 +31,8 @@ func SFTPGet(file, localFileName string) {
 	var sshClient *ssh.Client
 
 	config := ssh.ClientConfig{
-		User: string(userDec.Plaintext),
-		Auth: []ssh.AuthMethod{ssh.Password(string(passDec.Plaintext))},
+		User:            string(userDec.Plaintext),
+		Auth:            []ssh.AuthMethod{ssh.Password(string(passDec.Plaintext))},
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 	}
 	addr := fmt.Sprintf("%s:%d", os.Getenv("SFTP_HOST"), os.Getenv("SFTP_PORT"))
@@ -55,13 +55,12 @@ func SFTPGet(file, localFileName string) {
 	}
 	log.Println(fi)
 
-
-	remoteFile,err := sftpClient.Open(file)
+	remoteFile, err := sftpClient.Open(file)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	localFile,err := os.Create(localFileName)
+	localFile, err := os.Create(localFileName)
 	if err != nil {
 		log.Fatal(err)
 	}
