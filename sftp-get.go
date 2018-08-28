@@ -22,13 +22,13 @@ func SFTPGet(file, localFileName string) {
 
 	var sshClient *ssh.Client
 
-	config := ssh.ClientConfig{
+	config := &ssh.ClientConfig{
 		User:            username,
 		Auth:            []ssh.AuthMethod{ssh.Password(password)},
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 	}
 	addr := fmt.Sprintf("%s:%s", os.Getenv("SFTP_HOST"), os.Getenv("SFTP_PORT"))
-	sshClient.Conn, err = ssh.Dial("tcp", addr, &config)
+	sshClient.Conn, err = ssh.Dial("tcp", addr, config)
 	if err != nil {
 		log.Fatal("Failed to connect via sfpt")
 	}
