@@ -28,7 +28,7 @@ func SFTPGet(file, localFileName string) {
 	addr := fmt.Sprintf("%s:%s", os.Getenv("SFTP_HOST"), os.Getenv("SFTP_PORT"))
 	conn, err := ssh.Dial("tcp", addr, config)
 	if err != nil {
-		log.Fatal("Failed to connect via sfpt")
+		log.Fatal("Failed to connect via SFTP: ", err)
 	}
 
 	// open an SFTP session over an existing ssh connection.
