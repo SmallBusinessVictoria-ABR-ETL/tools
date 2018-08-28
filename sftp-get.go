@@ -20,21 +20,19 @@ func SFTPGet(file, localFileName string) {
 		log.Fatal("Failed to decrypt SFTP_PASS_ENC")
 	}
 
-	var sshClient *ssh.Client
-
 	config := &ssh.ClientConfig{
 		User:            username,
 		Auth:            []ssh.AuthMethod{ssh.Password(password)},
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 	}
 	addr := fmt.Sprintf("%s:%s", os.Getenv("SFTP_HOST"), os.Getenv("SFTP_PORT"))
-	sshClient.Conn, err = ssh.Dial("tcp", addr, config)
+	conn, err := ssh.Dial("tcp", addr, config)
 	if err != nil {
 		log.Fatal("Failed to connect via sfpt")
 	}
 
 	// open an SFTP session over an existing ssh connection.
-	sftpClient, err := sftp.NewClient(sshClient)
+	sftpClient, err := sftp.NewClient(conn)
 	if err != nil {
 		log.Fatal(err)
 	}
