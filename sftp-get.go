@@ -27,7 +27,7 @@ func SFTPGet(file, localFileName string) {
 		Auth:            []ssh.AuthMethod{ssh.Password(password)},
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 	}
-	addr := fmt.Sprintf("%s:%d", os.Getenv("SFTP_HOST"), os.Getenv("SFTP_PORT"))
+	addr := fmt.Sprintf("%s:%s", os.Getenv("SFTP_HOST"), os.Getenv("SFTP_PORT"))
 	sshClient.Conn, err = ssh.Dial("tcp", addr, &config)
 	if err != nil {
 		log.Fatal("Failed to connect via sfpt")
