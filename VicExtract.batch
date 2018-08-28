@@ -1,1 +1,1 @@
-get AllStates_ABR\ Data/Sent/VIC_ABR\ Extract.zip /Vic.zip
+get AllStates_ABR\ Data/Sent/VIC_ABR\ Extract.zip ${EXTRACT_DATE}-VIC_ABR_Extract.zip
