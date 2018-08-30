@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"crypto/md5"
+	"fmt"
 	"log"
 	"os"
 	"strconv"
@@ -14,7 +15,7 @@ type Record struct {
 	hash []byte
 }
 
-func Diff(one *os.File, two *os.File) {
+func Diff(one *os.File, two *os.File, updates *os.File, newRecords *os.File) {
 
 	hasher := md5.New()
 	hashMap := map[int]Record{}
@@ -51,15 +52,13 @@ func Diff(one *os.File, two *os.File) {
 		if hash, ok := hashMap[i]; ok {
 			if !bytes.Equal(hash.hash, hasher.Sum([]byte(scanner.Text()))) {
 
-				log.Print("Updated Record")
-				//fmt.Println(string(record[0]), string(line))
-				//fmt.Println(string(hash.record[0]), string(hash.line))
+				fmt.Fprintln(updates, scanner.Text())
 
 			} else {
 				//delete(hashMap, string(record[0]))
 			}
 		} else {
-			log.Print("New Record: " + scanner.Text())
+			fmt.Fprintln(newRecords, scanner.Text())
 		}
 	}
 

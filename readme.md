@@ -28,10 +28,10 @@ export GOPATH=$HOME/go
 export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin
 ```
 
-## Install/Update
+## Install/Updatep
 
 ```bash
-go get -u github.com/SmallBusinessVictoria-ABR-ETL/tools
+go get -u github.com/SmallBusinessVictoria-ABR-ETL/tools/...
 ```
 
 ## Encrypt username and passwords
@@ -59,9 +59,20 @@ go run sftp-get/app.go "AllStates_ABR Data/Sent/VIC_ABR Extract.zip" "`date +%Y%
 ```bash
 
 export AWS_REGION=ap-southeast-2 
-export EXTRACT_DATE="`date +%y%m%d`" 
+export EXTRACT_DATE="`date +%Y%m%d`" 
 envsubst < VicExtract.batch | sshpass -p `go run kms-decrypt/app.go AQICAHjAjhV7d3YGxLXMWTRObCPHtjQT0joQ4ZkhoypbVJ9fIQFefuYdq1x049a/iPESUlFKAAAAaDBmBgkqhkiG9w0BBwagWTBXAgEAMFIGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQMyY2jWUZOVygGcstEAgEQgCVKSUZMYnfxdQem2CEpMOqKgs30fzgCMv4E3ZcYvffcY9Ze7lZH` sftp -c aes256-cbc -o StrictHostKeyChecking=no -oKexAlgorithms=+diffie-hellman-group-exchange-sha256 `go run kms-decrypt/app.go AQICAHjAjhV7d3YGxLXMWTRObCPHtjQT0joQ4ZkhoypbVJ9fIQHuJuUm8IBYOZ3242iXQRjXAAAAezB5BgkqhkiG9w0BBwagbDBqAgEAMGUGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQMxAxT8oW24rAJNbtiAgEQgDjwifBrEL3vHSY3LF9bs1fQaEbHk/tOoAkbTWpdg03NKJGdsW628pdFhH7AwtWxKmNo+njLlIZ+5w==`@180.149.195.60
 
 ```
 
 
+## Diff (Updated + New)
+
+```bash
+aws s3 cp s3://sbv-abr-etl/FACT/AGENCY/date=2018-08-23/state=full/full.txt.gz ./previous.txt.gz 
+diff-abr previous.txt VIC*_ABR_Agency_Data.txt update.txt new.txt
+gzip update.txt
+gzip new.txt
+aws s3 cp update.txt.gz s3://sbv-abr-etl/FACT/AGENCY/date=`date +%Y-%m-%d`/state=update/update.txt.gz
+aws s3 cp new.txt.gz s3://sbv-abr-etl/FACT/AGENCY/date=`date +%Y-%m-%d`/state=new/new.txt.gz
+aws s3 cp VIC*_ABR_Agency_Data.txt s3://sbv-abr-etl/FACT/AGENCY/date=`date +%Y-%m-%d`/state=full/full.txt.gz
+```
