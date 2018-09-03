@@ -1,21 +1,3 @@
--- Load agency partitions
-MSCK REPAIR TABLE agency_v2;
-
--- Get Samples
-SELECT * from agency_v2 where "date"=DATE('2018-08-30') and state='previous' limit 10;
-SELECT * from agency_v2 where "date"=DATE('2018-08-30') and state='update' limit 10;
-SELECT * from agency_v2 where "date"=DATE('2018-08-30') and state='new' limit 10;
-
-
-SELECT * from agency_v2 where "date"=DATE('2018-07-16') and state='full' limit 10;
-SELECT * from agency_v2 where "date"=DATE('2018-08-30') and state='new' limit 10;
-
-
-SELECT count(*) from agency_v2 where "date"=DATE('2018-08-30') and state='previous';
-SELECT count(*) from agency_v2 where "date"=DATE('2018-08-30') and state='update';
-SELECT count(*) from agency_v2 where "date"=DATE('2018-08-30') and state='new';
-
-
 
 -- Main diffing query
 
@@ -31,11 +13,11 @@ SELECT
 
 -- Person Name
   coalesce (c.Nm_Titl_Cd, a.Nm_Titl_Cd) as Nm_Titl_Cd,
-  coalesce (c.Prsn_Gvn_Nm, a.Prsn_Gvn_Nm) as Prsn_Gvn_Nm, 
-  coalesce (c.Prsn_Othr_Gvn_Nm, a.Prsn_Othr_Gvn_Nm) as Prsn_Othr_Gvn_Nm, 
-  coalesce (c.Prsn_Fmly_Nm, a.Prsn_Fmly_Nm) as Prsn_Fmly_Nm, 
-  coalesce (c.Nm_Sufx_Cd, a.Nm_Sufx_Cd) as Nm_Sufx_Cd, 
-                                               
+  coalesce (c.Prsn_Gvn_Nm, a.Prsn_Gvn_Nm) as Prsn_Gvn_Nm,
+  coalesce (c.Prsn_Othr_Gvn_Nm, a.Prsn_Othr_Gvn_Nm) as Prsn_Othr_Gvn_Nm,
+  coalesce (c.Prsn_Fmly_Nm, a.Prsn_Fmly_Nm) as Prsn_Fmly_Nm,
+  coalesce (c.Nm_Sufx_Cd, a.Nm_Sufx_Cd) as Nm_Sufx_Cd,
+
   a.Nm_Titl_Cd as prev_Nm_Titl_Cd,
   a.Prsn_Gvn_Nm as prev_Prsn_Gvn_Nm,
   a.Prsn_Othr_Gvn_Nm as prev_Prsn_Othr_Gvn_Nm,
@@ -89,8 +71,8 @@ SELECT
   a.Mn_Bus_Cntry_Cd as prev_Mn_Bus_Cntry_Cd,
   a.Mn_Bus_DPID as prev_Mn_Bus_DPID,
 
-  if(f.Mn_Bus_Addr_Ln_1 is not null, f.date, null) as Mn_Bus_change_dt
-  
+  if(f.Mn_Bus_Addr_Ln_1 is not null, f.date, null) as Mn_Bus_change_dt,
+
 -- Email
   coalesce (g.Ent_Eml, a.Ent_Eml) as Ent_Eml,
   a.Ent_Eml as prev_Ent_Eml,
@@ -111,7 +93,7 @@ SELECT
   if(f.Mn_Indy_Clsn is not null, f.date, null) as Indy_Clsn_change_dt,
 
   a.ACN,
-  a.Sprsn_Ind,
+  a.Sprsn_Ind
 
 FROM agency_v2 a -- Previous
 LEFT JOIN agency_v2 b -- Updates (org_nm)
@@ -153,38 +135,3 @@ LEFT JOIN agency_v2 h -- Updates (Industry change)
     a.Mn_Indy_Clsn != h.Mn_Indy_Clsn
     OR a.Mn_Indy_Clsn_Descn != h.Mn_Indy_Clsn_Descn
   )
-
-WHERE d.SON_Addr_Ln_1 is not null
-limit 10
-
-UNION
-
-SELECT
-  a_new.pid,
-  a_new.ABN,
-  a_new.Ent_Typ_Cd,
-  null as prev_org_nm,
-  a_new.org_nm,
-  null as org_nm_change_dt
-
-FROM agency_v2 a_new
-WHERE a_new."date"=DATE('2018-08-30') and a_new.state='new'
-
-limit 10
-
-
-;
-
--- LEFT JOIN businesslocation bl ON a.PID=bl.PID
--- LEFT JOIN mappings_meshblocks_to_lga lga ON bl.bus_locn_msh_blk=CAST(lga.mb_code_2016 AS VARCHAR)
--- LEFT JOIN businessname bn ON a.PID=bn.pid
--- LEFT JOIN mappings_lga_vgbo_like_councils_nopartitions lc ON lga.lga_name_2016=lc.local_government_area
-
-
-
-
-
-
-
-SELECT * FROM agency a
-
