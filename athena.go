@@ -17,6 +17,9 @@ func init() {
 func Query(sql, location string) {
 	resp, err := athenaSession.StartQueryExecution(&athena.StartQueryExecutionInput{
 		QueryString: aws.String(sql),
+		QueryExecutionContext: &athena.QueryExecutionContext{
+			Database: aws.String("sbv_abr"),
+		},
 		ResultConfiguration: &athena.ResultConfiguration{
 			OutputLocation: aws.String(location),
 		},
@@ -25,7 +28,7 @@ func Query(sql, location string) {
 		log.Fatal(err)
 	}
 
-	for c := 0; c < 500; c++ {
+	for true {
 		r2, err := athenaSession.GetQueryExecution(&athena.GetQueryExecutionInput{
 			QueryExecutionId: resp.QueryExecutionId,
 		})
@@ -33,7 +36,13 @@ func Query(sql, location string) {
 			log.Fatal(err)
 		}
 
-		log.Print("QueryId: ", *r2.QueryExecution.Status.State)
+		log.Print("State: ", *r2.QueryExecution.Status.State)
 		time.Sleep(time.Second)
+
+		if *r2.QueryExecution.Status.State != "RUNNING" {
+			log.Print(*r2.QueryExecution.Status)
+			break
+		}
+
 	}
 }

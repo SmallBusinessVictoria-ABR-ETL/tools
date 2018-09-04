@@ -1,9 +1,26 @@
 package main
 
-import "github.com/SmallBusinessVictoria-ABR-ETL/tools"
+import (
+	"bytes"
+	"fmt"
+	"github.com/SmallBusinessVictoria-ABR-ETL/tools"
+	"log"
+	"os"
+	"text/template"
+)
 
 func main() {
-	tools.Query(`
+
+	data := struct {
+		Prev string
+		New  string
+	}{
+		Prev: os.Args[1],
+		New:  os.Args[2],
+	}
+
+	var sql bytes.Buffer
+	tpl, err := template.New("Query").Parse(`
 
 -- Main diffing query
 
@@ -103,9 +120,9 @@ SELECT
 
 FROM agency_v2 a -- Previous
 LEFT JOIN agency_v2 b -- Updates (org_nm)
-  ON a.pid = b.pid AND a."date"=DATE('2018-07-16') and a.state='full' and b."date"=DATE('2018-08-30') and b.state='update' and a.org_nm != b.org_nm
+  ON a.pid = b.pid AND a."date"=DATE('{{.Prev}}') and a.state='full' and b."date"=DATE('{{.New}}') and b.state='update' and a.org_nm != b.org_nm
 LEFT JOIN agency_v2 c -- Updates (name change)
-  ON a.pid = c.pid AND a."date"=DATE('2018-07-16') and a.state='full' and c."date"=DATE('2018-08-30') and c.state='update' and (
+  ON a.pid = c.pid AND a."date"=DATE('{{.Prev}}') and a.state='full' and c."date"=DATE('{{.New}}') and c.state='update' and (
     a.Nm_Titl_Cd != c.Nm_Titl_Cd
     OR a.Prsn_Gvn_Nm != c.Prsn_Gvn_Nm
     OR a.Prsn_Othr_Gvn_Nm != c.Prsn_Othr_Gvn_Nm
@@ -113,9 +130,9 @@ LEFT JOIN agency_v2 c -- Updates (name change)
     OR a.Nm_Sufx_Cd != c.Nm_Sufx_Cd
   )
 LEFT JOIN agency_v2 d -- Updates (Mn_Trdg_Nm Change)
-  ON a.pid = d.pid AND a."date"=DATE('2018-07-16') and a.state='full' and d."date"=DATE('2018-08-30') and d.state='update' and a.Mn_Trdg_Nm != d.Mn_Trdg_Nm
+  ON a.pid = d.pid AND a."date"=DATE('{{.Prev}}') and a.state='full' and d."date"=DATE('{{.New}}') and d.state='update' and a.Mn_Trdg_Nm != d.Mn_Trdg_Nm
 LEFT JOIN agency_v2 e -- Updates (SON change)
-  ON a.pid = e.pid AND a."date"=DATE('2018-07-16') and a.state='full' and e."date"=DATE('2018-08-30') and e.state='update' and (
+  ON a.pid = e.pid AND a."date"=DATE('{{.Prev}}') and a.state='full' and e."date"=DATE('{{.New}}') and e.state='update' and (
     a.SON_Addr_Ln_1 != e.SON_Addr_Ln_1
     OR a.SON_Addr_Ln_2 != e.SON_Addr_Ln_2
     OR a.SON_Sbrb != e.SON_Sbrb
@@ -125,7 +142,7 @@ LEFT JOIN agency_v2 e -- Updates (SON change)
     OR a.SON_DPID != e.SON_DPID
   )
 LEFT JOIN agency_v2 f -- Updates (Mn_Bus change)
-  ON a.pid = f.pid AND a."date"=DATE('2018-07-16') and a.state='full' and f."date"=DATE('2018-08-30') and f.state='update' and (
+  ON a.pid = f.pid AND a."date"=DATE('{{.Prev}}') and a.state='full' and f."date"=DATE('{{.New}}') and f.state='update' and (
     a.Mn_Bus_Addr_Ln_1 != f.Mn_Bus_Addr_Ln_1
     OR a.Mn_Bus_Addr_Ln_2 != f.Mn_Bus_Addr_Ln_2
     OR a.Mn_Bus_Sbrb != f.Mn_Bus_Sbrb
@@ -135,13 +152,22 @@ LEFT JOIN agency_v2 f -- Updates (Mn_Bus change)
     OR a.Mn_Bus_DPID != f.Mn_Bus_DPID
   )
 LEFT JOIN agency_v2 g -- Updates (Email Change)
-  ON a.pid = g.pid AND a."date"=DATE('2018-07-16') and a.state='full' and g."date"=DATE('2018-08-30') and g.state='update' and a.Ent_Eml != g.Ent_Eml
+  ON a.pid = g.pid AND a."date"=DATE('{{.Prev}}') and a.state='full' and g."date"=DATE('{{.New}}') and g.state='update' and a.Ent_Eml != g.Ent_Eml
 LEFT JOIN agency_v2 h -- Updates (Industry change)
-  ON a.pid = f.pid AND a."date"=DATE('2018-07-16') and a.state='full' and f."date"=DATE('2018-08-30') and f.state='update' and (
+  ON a.pid = f.pid AND a."date"=DATE('{{.Prev}}') and a.state='full' and f."date"=DATE('{{.New}}') and f.state='update' and (
     a.Mn_Indy_Clsn != h.Mn_Indy_Clsn
     OR a.Mn_Indy_Clsn_Descn != h.Mn_Indy_Clsn_Descn
   )
+`)
 
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = tpl.Execute(&sql, data)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-`, "s3://sbv-abr-etl/ETL/Agency/date=2018-09-03/state=combined/combined.csv")
+	fmt.Print(string(sql.Bytes()))
+	tools.Query(sql.String(), "s3://sbv-abr-etl/ETL/Agency/date="+data.New+"/state=combined/combined.csv")
 }

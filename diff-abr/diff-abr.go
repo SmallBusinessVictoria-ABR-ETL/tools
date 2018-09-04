@@ -15,14 +15,10 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	updates, err := os.Create(os.Args[3])
-	if err != nil {
-		log.Fatal(err)
-	}
-	newRecords, err := os.Create(os.Args[4])
+	newRecords, err := os.Create(os.Args[3])
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	tools.Diff(one, two, updates, newRecords)
+	tools.Diff(one, two, newRecords, os.Args[4])
 }
