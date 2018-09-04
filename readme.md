@@ -1,3 +1,27 @@
+## Pipeline
+
+- Job server started by CloudWatch Rules
+- upstart script run ./full-pipeline
+    - Fetch via SFTP
+    - Diff using go script
+    - convert to parquet
+    - update to s3
+- script completes, sends slack message
+- and shuts down the server
+ 
+### Maintenance
+
+To prevent the server to running pipeline and shutting down
+
+```bash
+echo 'disabled' > disabled && aws s3 cp disabled s3://sbv-abr-etl/disabled && rm disabled
+ssh sbv 
+```
+
+**Re-enable ETL**
+```bash
+echo '' > disabled && aws s3 cp disabled s3://sbv-abr-etl/disabled && rm disabled 
+```
 
 ## Dev Requirements
 
