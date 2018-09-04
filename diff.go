@@ -12,69 +12,65 @@ import (
 )
 
 type Record struct {
-	OrgNameHash     []byte
-	OrgName         []string
-	NameHash        []byte
-	Name            []string
-	TradingNameHash []byte
-	TradingName     []string
-	SONAddressHash  []byte
-	SONAddress      []string
-	BusAddressHash  []byte
-	BusAddress      []string
-	EmailHash       []byte
-	Email           []string
-	IndustryHash    []byte
-	Industry        []string
+	OrgNameHash         []byte
+	OrgName             []string
+	PrevOrgNameDate     []string
+	NameHash            []byte
+	Name                []string
+	PrevNameDate        []string
+	TradingNameHash     []byte
+	TradingName         []string
+	PrevTradingNameDate []string
+	SONAddressHash      []byte
+	SONAddress          []string
+	PrevSONAddressDate  []string
+	BusAddressHash      []byte
+	BusAddress          []string
+	PrevBusAddressDate  []string
+	EmailHash           []byte
+	Email               []string
+	PrevEmailDate       []string
+	IndustryHash        []byte
+	Industry            []string
+	PrevIndustryDate    []string
 }
 
 func hashRecord(r []string) Record {
 
-	// PID	integer
-	// ABN	varchar(20)
-	// Ent_Typ_Cd	varchar(3)
+	if len(r) < 3 {
+		return Record{}
+	}
 
-	// Org_Nm	varchar(200)
+	return Record{
+		OrgNameHash:         hashSet(r[3:4]),
+		OrgName:             r[3:4],
+		PrevOrgNameDate:     []string{"", ""},
+		NameHash:            hashSet(r[4:9]),
+		Name:                r[4:9],
+		PrevNameDate:        []string{"", "", "", "", "", ""},
+		TradingNameHash:     hashSet(r[11:12]),
+		TradingName:         r[11:12],
+		PrevTradingNameDate: []string{"", ""},
+		SONAddressHash:      hashSet(r[12:19]),
+		SONAddress:          r[12:19],
+		PrevSONAddressDate:  []string{"", "", "", "", "", "", "", ""},
+		BusAddressHash:      hashSet(r[19:26]),
+		BusAddress:          r[19:26],
+		PrevBusAddressDate:  []string{"", "", "", "", "", "", "", ""},
+		EmailHash:           hashSet(r[26:27]),
+		Email:               r[26:27],
+		PrevEmailDate:       []string{"", ""},
+		IndustryHash:        hashSet(r[30:32]),
+		Industry:            r[30:32],
+		PrevIndustryDate:    []string{"", "", ""},
+	}
 
-	// Nm_Titl_Cd	varchar(12)  4
-	// Prsn_Gvn_Nm	varchar(40)
-	// Prsn_Othr_Gvn_Nm	varchar(100)
-	// Prsn_Fmly_Nm	varchar(40)
-	// Nm_Sufx_Cd	varchar(5)    8
+}
 
-	// ABN_Regn_Dt	varchar(8)
-	// ABN_Cancn_Dt	varchar(8)
-
-	// Mn_Trdg_Nm	varchar(200)   11
-
-	// SON_Addr_Ln_1	varchar(38)   12
-	// SON_Addr_Ln_2	varchar(38)
-	// SON_Sbrb	varchar(46)
-	// SON_Stt	varchar(3)
-	// SON_Pc	varchar(12)
-	// SON_Cntry_Cd	varchar(3)
-	// SON_DPID	integer                 18
-
-	// Mn_Bus_Addr_Ln_1	varchar(38)       19
-	// Mn_Bus_Addr_Ln_2	varchar(38)
-	// Mn_Bus_Sbrb	varchar(46)
-	// Mn_Bus_Stt	varchar(3)
-	// Mn_Bus_Pc	varchar(12)
-	// Mn_Bus_Cntry_Cd	varchar(3)
-	// Mn_Bus_DPID	integer               25
-
-	// Ent_Eml	varchar(200)              26
-
-	// Prty_Id_Blnk	varchar(1)
-	// GST_Regn_Dt	varchar(8)
-	// GST_Cancn_Dt	varchar(8)
-
-	// Mn_Indy_Clsn	varchar(5)             30
-	// Mn_Indy_Clsn_Descn	varchar(100)   31
-
-	// ACN	varchar(20)
-	// Sprsn_Ind	varchar(1)
-
+/**
+There are ones created by this tool
+*/
+func hashCombinedRecord(r []string) Record {
 	if len(r) < 3 {
 		return Record{}
 	}
@@ -82,21 +78,22 @@ func hashRecord(r []string) Record {
 	return Record{
 		OrgNameHash:     hashSet(r[3:4]),
 		OrgName:         r[3:4],
-		NameHash:        hashSet(r[4:9]),
-		Name:            r[4:9],
-		TradingNameHash: hashSet(r[11:12]),
-		TradingName:     r[11:12],
-		SONAddressHash:  hashSet(r[12:19]),
-		SONAddress:      r[12:19],
-		BusAddressHash:  hashSet(r[19:26]),
-		BusAddress:      r[19:26],
-		EmailHash:       hashSet(r[26:27]),
-		Email:           r[26:27],
-		IndustryHash:    hashSet(r[30:32]),
-		Industry:        r[30:32],
+		NameHash:        hashSet(r[6:11]),
+		Name:            r[6:11],
+		TradingNameHash: hashSet(r[19:20]),
+		TradingName:     r[19:20],
+		SONAddressHash:  hashSet(r[22:29]),
+		SONAddress:      r[22:29],
+		BusAddressHash:  hashSet(r[37:44]),
+		BusAddress:      r[37:44],
+		EmailHash:       hashSet(r[52:53]),
+		Email:           r[52:53],
+		IndustryHash:    hashSet(r[58:60]),
+		Industry:        r[58:60],
 	}
 
 }
+
 func hashSet(i []string) []byte {
 	hasher := md5.New()
 	return hasher.Sum([]byte(strings.Join(i, "\t")))
@@ -108,7 +105,7 @@ func Diff(one *os.File, two *os.File, updateFile *os.File, date string) {
 
 	scanner := bufio.NewScanner(one)
 	for scanner.Scan() {
-		record := strings.SplitN(scanner.Text(), "\t", 34)
+		record := strings.SplitN(scanner.Text(), "\t", 64)
 		if len(record) < 34 {
 			log.Print("Skipping short row ", scanner.Text())
 			os.Exit(1)
@@ -124,14 +121,22 @@ func Diff(one *os.File, two *os.File, updateFile *os.File, date string) {
 			log.Fatal(err)
 		}
 
-		hashMap[i] = hashRecord(record)
-		//if len(hashMap[i].Name)> 0 && hashMap[i].Name[0] != "" {
-		//	fmt.Print(len(hashMap[i].Name));
-		//	os.Exit(1);
-		//}
+		if len(record) > 34 {
+			hashMap[i] = hashCombinedRecord(record)
+		} else {
+			hashMap[i] = hashRecord(record)
+		}
 	}
 
 	scanner = bufio.NewScanner(two)
+
+	OrgNameChangeFile, _ := os.Create("OrgNameChange.txt")
+	NameChangeFile, _ := os.Create("NameChange.txt")
+	TradingNameChangeFile, _ := os.Create("TradingNameChange.txt")
+	SONAddressChangeFile, _ := os.Create("SONAddressChange.txt")
+	BusAddressChangeFile, _ := os.Create("BusAddressChange.txt")
+	EmailChangeFile, _ := os.Create("EmailChange.txt")
+	IndustryChangeFile, _ := os.Create("IndustryChange.txt")
 
 	updated := 0
 	newRecords := 0
@@ -143,19 +148,14 @@ func Diff(one *os.File, two *os.File, updateFile *os.File, date string) {
 			os.Exit(1)
 			continue
 		}
-
-		//if len(record) != 34 {
-		//	log.Print("Wrong number of cells: "+string(line), len(record))
-		//	continue
-		//}
 		i, err := strconv.Atoi(record[0])
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		if old, ok := hashMap[i]; ok {
-			nr := hashRecord(record)
+		nr := hashRecord(record)
 
+		if old, ok := hashMap[i]; ok {
 			combined := []string{
 				record[0],
 				record[1],
@@ -166,20 +166,21 @@ func Diff(one *os.File, two *os.File, updateFile *os.File, date string) {
 				combined = append(combined, nr.OrgName...)
 				combined = append(combined, old.OrgName...)
 				combined = append(combined, date)
+				fmt.Fprintln(OrgNameChangeFile, record[0]+"\t"+strings.Join(nr.OrgName, "\t")+"\t"+date)
 				update = 1
 			} else {
 				combined = append(combined, old.OrgName...)
-				combined = append(combined, "")
-				combined = append(combined, date)
+				combined = append(combined, old.PrevOrgNameDate...)
 			}
 			if !bytes.Equal(old.NameHash, nr.NameHash) {
 				combined = append(combined, nr.Name...)
 				combined = append(combined, old.Name...)
 				combined = append(combined, date)
+				fmt.Fprintln(NameChangeFile, record[0]+"\t"+strings.Join(nr.Name, "\t")+"\t"+date)
 				update = 1
 			} else {
 				combined = append(combined, old.Name...)
-				combined = append(combined, "", "", "", "", "", "")
+				combined = append(combined, old.PrevNameDate...)
 			}
 			combined = append(combined,
 				record[9],
@@ -189,39 +190,44 @@ func Diff(one *os.File, two *os.File, updateFile *os.File, date string) {
 				combined = append(combined, nr.TradingName...)
 				combined = append(combined, old.TradingName...)
 				combined = append(combined, date)
+				fmt.Fprintln(TradingNameChangeFile, record[0]+"\t"+strings.Join(nr.TradingName, "\t")+"\t"+date)
 				update = 1
 			} else {
 				combined = append(combined, old.TradingName...)
-				combined = append(combined, "")
-				combined = append(combined, date)
+				combined = append(combined, old.PrevTradingNameDate...)
+
 			}
 			if !bytes.Equal(old.SONAddressHash, nr.SONAddressHash) {
 				combined = append(combined, nr.SONAddress...)
 				combined = append(combined, old.SONAddress...)
 				combined = append(combined, date)
+				fmt.Fprintln(SONAddressChangeFile, record[0]+"\t"+strings.Join(nr.SONAddress, "\t")+"\t"+date)
 				update = 1
 			} else {
 				combined = append(combined, old.SONAddress...)
-				combined = append(combined, "", "", "", "", "", "", "", "")
+				combined = append(combined, old.PrevSONAddressDate...)
+
 			}
 			if !bytes.Equal(old.BusAddressHash, nr.BusAddressHash) {
 				combined = append(combined, nr.BusAddress...)
 				combined = append(combined, old.BusAddress...)
 				combined = append(combined, date)
+				fmt.Fprintln(BusAddressChangeFile, record[0]+"\t"+strings.Join(nr.BusAddress, "\t")+"\t"+date)
 				update = 1
 			} else {
 				combined = append(combined, old.BusAddress...)
-				combined = append(combined, "", "", "", "", "", "", "", "")
+				combined = append(combined, old.PrevBusAddressDate...)
+
 			}
 			if !bytes.Equal(old.EmailHash, nr.EmailHash) {
 				combined = append(combined, nr.Email...)
 				combined = append(combined, old.Email...)
 				combined = append(combined, date)
+				fmt.Fprintln(EmailChangeFile, record[0]+"\t"+strings.Join(nr.Email, "\t")+"\t"+date)
 				update = 1
 			} else {
 				combined = append(combined, old.Email...)
-				combined = append(combined, "")
-				combined = append(combined, date)
+				combined = append(combined, old.PrevEmailDate...)
 			}
 			combined = append(combined,
 				record[27],
@@ -232,11 +238,11 @@ func Diff(one *os.File, two *os.File, updateFile *os.File, date string) {
 				combined = append(combined, nr.Industry...)
 				combined = append(combined, old.Industry...)
 				combined = append(combined, date)
+				fmt.Fprintln(IndustryChangeFile, record[0]+"\t"+strings.Join(nr.Industry, "\t")+"\t"+date)
 				update = 1
 			} else {
 				combined = append(combined, old.Industry...)
-				combined = append(combined, "")
-				combined = append(combined, date)
+				combined = append(combined, old.PrevIndustryDate...)
 			}
 			combined = append(combined,
 				record[32],
@@ -298,8 +304,24 @@ func Diff(one *os.File, two *os.File, updateFile *os.File, date string) {
 			}
 			fmt.Fprintln(updateFile, strings.Join(combined, "\t"))
 			newRecords++
+
+			fmt.Fprintln(OrgNameChangeFile, record[0]+"\t"+strings.Join(nr.OrgName, "\t")+"\t"+date)
+			fmt.Fprintln(NameChangeFile, record[0]+"\t"+strings.Join(nr.Name, "\t")+"\t"+date)
+			fmt.Fprintln(TradingNameChangeFile, record[0]+"\t"+strings.Join(nr.TradingName, "\t")+"\t"+date)
+			fmt.Fprintln(SONAddressChangeFile, record[0]+"\t"+strings.Join(nr.SONAddress, "\t")+"\t"+date)
+			fmt.Fprintln(BusAddressChangeFile, record[0]+"\t"+strings.Join(nr.BusAddress, "\t")+"\t"+date)
+			fmt.Fprintln(EmailChangeFile, record[0]+"\t"+strings.Join(nr.Email, "\t")+"\t"+date)
+			fmt.Fprintln(IndustryChangeFile, record[0]+"\t"+strings.Join(nr.Industry, "\t")+"\t"+date)
 		}
 	}
+
+	OrgNameChangeFile.Close()
+	NameChangeFile.Close()
+	TradingNameChangeFile.Close()
+	SONAddressChangeFile.Close()
+	BusAddressChangeFile.Close()
+	EmailChangeFile.Close()
+	IndustryChangeFile.Close()
 
 	fmt.Print("Updated Records: %d\nNew Records: %d", updated, newRecords)
 
