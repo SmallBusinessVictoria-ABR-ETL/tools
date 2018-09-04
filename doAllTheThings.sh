@@ -18,26 +18,20 @@ cd ${EXTRACT_DATE}
 # upload all files excluding the main Agency file to /raw/<date> on S3
 aws s3 sync . s3://sbv-abr-etl/raw/${EXTRACT_DATE} --exclude "*" --include "*.txt" --exclude "VIC${EXTRACT_DATE}_ABR_Agency_Data.txt"
 
-# download the previous data dump to ./previous and gunzip it
-mkdir previous
-aws s3 sync s3://sbv-abr-etl/previous/ ./previous/
-gunzip previous/full.txt.gz
+# Compare previous with current Agency file generate combine file + Changing Dimensions partitions
+diff-abr ../previous-combine.txt VIC${EXTRACT_DATE_SHORT}_ABR_Agency_Data.txt combined.txt ${DATE_PARTITION}
 
-# rename the current data dump to full.txt and then run the diff program against the previous one
-mv VIC${EXTRACT_DATE_SHORT}_ABR_Agency_Data.txt full.txt
-diff-abr full.txt ./previous/full.txt new.txt updated.txt
+# Replace agency data with new file -- TODO: convert to parquet
+aws s3 cp combined.txt s3://sbv-abr-etl/FACT/AGENCY/combined.txt
 
+# Add new change partitions
+aws s3 cp OrgNameChange.txt s3://sbv-abr-etl/DIMENSION/OrgNameChange/date=${DATE_PARTITION}/OrgNameChange.txt
+aws s3 cp NameChange.txt s3://sbv-abr-etl/DIMENSION/NameChange/date=${DATE_PARTITION}/NameChange.txt
+aws s3 cp TradingNameChange.txt s3://sbv-abr-etl/DIMENSION/TradingNameChange/date=${DATE_PARTITION}/TradingNameChange.txt
+aws s3 cp SONAddressChange.txt s3://sbv-abr-etl/DIMENSION/SONAddressChange/date=${DATE_PARTITION}/SONAddressChange.txt
+aws s3 cp BusAddressChange.txt s3://sbv-abr-etl/DIMENSION/BusAddressChange/date=${DATE_PARTITION}/BusAddressChange.txt
+aws s3 cp EmailChange.txt s3://sbv-abr-etl/DIMENSION/EmailChange/date=${DATE_PARTITION}/EmailChange.txt
+aws s3 cp IndustryChange.txt s3://sbv-abr-etl/DIMENSION/IndustryChange/date=${DATE_PARTITION}/IndustryChange.txt
 
-# gzip the 3 new files
-gzip full.txt new.txt updated.txt
-
-# copy the new files to the right location on S3
-aws s3 cp full.txt.gz s3://sbv-abr-etl/FACT/AGENCY/date=${DATE_PARTITION}/state=full/
-aws s3 cp updated.txt.gz s3://sbv-abr-etl/FACT/AGENCY/date=${DATE_PARTITION}/state=updated/
-aws s3 cp new.txt.gz s3://sbv-abr-etl/FACT/AGENCY/date=${DATE_PARTITION}/state=new/
-
-# create a date.txt file with the current date and push date.txt and the full.txt.gz through to S3/previous
-echo ${EXTRACT_DATE} > date.txt
-aws s3 rm s3://sbv-abr-etl/previous/ --recursive
-aws s3 sync . s3://sbv-abr-etl/previous --exclude "*" --include "full.txt.gz" --include "date.txt"
-
+# Copy current combined into parent folder for next run
+cp combined.txt ../previous-combine.txt
