@@ -323,6 +323,6 @@ func Diff(one *os.File, two *os.File, updateFile *os.File, date string) {
 	EmailChangeFile.Close()
 	IndustryChangeFile.Close()
 
-	fmt.Print("Updated Records: %d\nNew Records: %d", updated, newRecords)
+	fmt.Printf("Updated Records: %d\nNew Records: %d", updated, newRecords)
 
 }
