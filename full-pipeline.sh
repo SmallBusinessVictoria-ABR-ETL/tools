@@ -11,10 +11,10 @@ fi
 cd `dirname $0`
 
 # Fetch VIC Records from ABR
-./fetchVicExtract.sh
+bash ./fetchVicExtract.sh
 
 # Diff, Convert to Parquet and Push to S3
-./doAllTheThings.sh
+bash ./doAllTheThings.sh
 
 # Update related tables + Transport location
 python csvToParquet.py
