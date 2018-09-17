@@ -4,10 +4,10 @@
 #
 # for testing, if you have already run this script today then you should delete the directory that it created (e.g. 20180903)
 # in S3 you should also delete the /raw/<date>/ and /FACT/AGENCY/date=<date>/ directories
-
-EXTRACT_DATE="`date +%Y%m%d`"
-EXTRACT_DATE_SHORT="`date +%y%m%d`"
-DATE_PARTITION="`date +%Y-%m-%d`"
+export
+export EXTRACT_DATE="`date +%Y%m%d`"
+export EXTRACT_DATE_SHORT="`date +%y%m%d`"
+export DATE_PARTITION="`date +%Y-%m-%d`"
 
 # creates a local directory and extracts the data dump files
 mkdir ${EXTRACT_DATE}
@@ -22,6 +22,7 @@ aws s3 sync . s3://sbv-abr-etl/raw/${EXTRACT_DATE} --exclude "*" --include "*.tx
 diff-abr ../previous-combine.txt VIC${EXTRACT_DATE_SHORT}_ABR_Agency_Data.txt combined.txt ${DATE_PARTITION}
 
 # Replace agency data with new file -- TODO: convert to parquet
+cp combined.txt ../previous-combine.txt
 gzip combined.txt
 aws s3 cp combined.txt.gz s3://sbv-abr-etl/FACT/AGENCY/combined.txt.gz
 

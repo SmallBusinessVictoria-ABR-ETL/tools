@@ -1,6 +1,7 @@
 package tools
 
 import (
+	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/athena"
@@ -27,7 +28,6 @@ func Query(sql, location string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	for true {
 		r2, err := athenaSession.GetQueryExecution(&athena.GetQueryExecutionInput{
 			QueryExecutionId: resp.QueryExecutionId,
@@ -41,6 +41,9 @@ func Query(sql, location string) {
 
 		if *r2.QueryExecution.Status.State != "RUNNING" {
 			log.Print(*r2.QueryExecution.Status)
+
+			fmt.Print("\n\n-----\n" + location + "/" + *resp.QueryExecutionId + ".csv\n\n-----\n")
+
 			break
 		}
 
