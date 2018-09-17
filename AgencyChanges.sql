@@ -16,7 +16,6 @@ SELECT count(*) from agency_v2 where "date"=DATE('2018-08-30') and state='update
 SELECT count(*) from agency_v2 where "date"=DATE('2018-08-30') and state='new';
 
 
-
 -- Main diffing query
 
 SELECT

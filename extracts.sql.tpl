@@ -104,7 +104,7 @@ bl.bus_locn_indy_clsn_descn,
 bn.bus_nm
 
 
-FROM agency_combined a
+FROM agency a
   JOIN location bl ON a.pid = bl.pid
   JOIN (SELECT array_join(array_agg(bus_nm), ', ') bus_nm,pid from businessname group by pid) bn ON a.pid = bn.pid
  WHERE

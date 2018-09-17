@@ -8,6 +8,6 @@ import (
 func main() {
 
 	f, _ := os.Open(os.Args[1])
-	tools.ViewPid(f, os.Args[2])
+	tools.Validate(f)
 
 }

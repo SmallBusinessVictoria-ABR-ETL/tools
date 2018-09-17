@@ -33,6 +33,7 @@ type Record struct {
 	IndustryHash        []byte
 	Industry            []string
 	PrevIndustryDate    []string
+	HashType            string
 }
 
 func hashRecord(r []string) Record {
@@ -63,6 +64,7 @@ func hashRecord(r []string) Record {
 		IndustryHash:        hashSet(r[30:32]),
 		Industry:            r[30:32],
 		PrevIndustryDate:    []string{"", "", ""},
+		HashType:            "Regular",
 	}
 
 }
@@ -76,20 +78,28 @@ func hashCombinedRecord(r []string) Record {
 	}
 
 	return Record{
-		OrgNameHash:     hashSet(r[3:4]),
-		OrgName:         r[3:4],
-		NameHash:        hashSet(r[6:11]),
-		Name:            r[6:11],
-		TradingNameHash: hashSet(r[19:20]),
-		TradingName:     r[19:20],
-		SONAddressHash:  hashSet(r[22:29]),
-		SONAddress:      r[22:29],
-		BusAddressHash:  hashSet(r[37:44]),
-		BusAddress:      r[37:44],
-		EmailHash:       hashSet(r[52:53]),
-		Email:           r[52:53],
-		IndustryHash:    hashSet(r[58:60]),
-		Industry:        r[58:60],
+		OrgNameHash:         hashSet(r[3:4]),
+		OrgName:             r[3:4],
+		PrevOrgNameDate:     r[4:6],
+		NameHash:            hashSet(r[6:11]),
+		Name:                r[6:11],
+		PrevNameDate:        r[11:17],
+		TradingNameHash:     hashSet(r[19:20]),
+		TradingName:         r[19:20],
+		PrevTradingNameDate: r[20:22],
+		SONAddressHash:      hashSet(r[22:29]),
+		SONAddress:          r[22:29],
+		PrevSONAddressDate:  r[29:37],
+		BusAddressHash:      hashSet(r[37:44]),
+		BusAddress:          r[37:44],
+		PrevBusAddressDate:  r[44:52],
+		EmailHash:           hashSet(r[52:53]),
+		Email:               r[52:53],
+		PrevEmailDate:       r[53:55],
+		IndustryHash:        hashSet(r[58:60]),
+		Industry:            r[58:60],
+		PrevIndustryDate:    r[60:63],
+		HashType:            "Combined",
 	}
 
 }
@@ -249,6 +259,14 @@ func Diff(one *os.File, two *os.File, updateFile *os.File, date string) {
 				record[33],
 			)
 			updated += update
+			if update == 1 {
+				if len(namesCombined) > len(combined) {
+					fmt.Print("Too Short for Combined\n\n")
+					fmt.Print(old.HashType, "\n\n")
+					ViewRow(combined)
+					os.Exit(1)
+				}
+			}
 			fmt.Fprintln(updateFile, strings.Join(combined, "\t"))
 
 		} else {
@@ -323,6 +341,6 @@ func Diff(one *os.File, two *os.File, updateFile *os.File, date string) {
 	EmailChangeFile.Close()
 	IndustryChangeFile.Close()
 
-	fmt.Printf("Updated Records: %d\nNew Records: %d", updated, newRecords)
+	fmt.Printf("Updated Records: %d\nNew Records: %d\n", updated, newRecords)
 
 }
