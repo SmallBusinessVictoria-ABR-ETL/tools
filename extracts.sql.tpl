@@ -21,7 +21,7 @@ a.prev_nm_sufx_cd,
 try(date_format(a.nm_change_date,'%d%m%Y')) as nm_change_date,
 try(date_format(date_parse(a.abn_regn_dt, '%Y%m%d'),'%d%m%Y')) as abn_regn_dt,
 try(date_format(date_parse(a.abn_cancn_dt, '%Y%m%d'),'%d%m%Y')) as abn_cancn_dt,
-if(a.abn_cancn_dt = '','Active','Cancelled') as ABN_Status__c,
+if(try_cast(abn_cancn_dt as integer) is null,'Active','Cancelled') as ABN_Status__c,
 a.mn_trdg_nm,
 a.prev_mn_trdg_nm,
 try(date_format(a.mn_trdg_change_date,'%d%m%Y')) as mn_trdg_change_date,
@@ -106,9 +106,8 @@ bn.bus_nm
 
 FROM agency a
   JOIN location bl ON a.pid = bl.pid
-  JOIN (SELECT array_join(array_agg(bus_nm), ', ') bus_nm,pid from businessname group by pid) bn ON a.pid = bn.pid
+  LEFT JOIN (SELECT array_join(array_agg(bus_nm), ', ') bus_nm,pid from businessname group by pid) bn ON a.pid = bn.pid
  WHERE
-       a.ent_typ_cd in ('IND', 'LPT', 'OIE', 'PRV', 'PTR', 'PTT', 'PUB', 'STR', 'UIE')
-   AND bl.locn_typ_cd = '010'
+       a.ent_typ_cd in ('ADF', 'CMT', 'COP', 'CUT', 'DIT', 'DST', 'DTT', 'FHS', 'FPT', 'FUT', 'FXT', 'HYT', 'IND', 'LPT', 'NPF', 'NRF', 'OIE', 'PDF', 'POF', 'PQT', 'PRV', 'PST', 'PTR', 'PTT', 'PUB', 'PUT', 'SAF', 'SUP', 'TRT', 'UIE', 'ARF')
   AND bl.bus_locn_indy_clsn = '{{.Arg1}}'
 

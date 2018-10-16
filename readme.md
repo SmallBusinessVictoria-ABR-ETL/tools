@@ -11,6 +11,15 @@
  
 ### Maintenance
 
+```
+# list instances
+AWS_PROFILE=sbv aws ec2 describe-instances --query "Reservations[*].Instances[*].{Tags:Tags,Id:InstanceId}" --output text
+
+# start etl server
+AWS_PROFILE=sbv aws ec2 start-instances --instance-id i-0565b1d1cf8e5c0b1
+```
+
+
 To prevent the server to running pipeline and shutting down
 
 ```bash
