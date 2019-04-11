@@ -22,9 +22,10 @@ aws s3 sync . s3://sbv-abr-etl/raw/${EXTRACT_DATE} --exclude "*" --include "*.tx
 diff-abr ../previous-combine.txt VIC${EXTRACT_DATE_SHORT}_ABR_Agency_Data.txt combined.txt ${DATE_PARTITION}
 
 # Replace agency data with new file -- TODO: convert to parquet
+# Copy current combined into parent folder for next run
 cp combined.txt ../previous-combine.txt
 gzip combined.txt
-aws s3 cp combined.txt.gz s3://sbv-abr-etl/FACT/AGENCY/combined.txt.gz
+aws s3 cp combined.txt.gz s3://sbv-abr-etl/FACT/AGENCY/combined.txt.gzcat ../
 
 # Compress files
 gzip OrgNameChange.txt
@@ -43,6 +44,3 @@ aws s3 cp SONAddressChange.txt.gz s3://sbv-abr-etl/DIMENSION/SONAddressChange/da
 aws s3 cp BusAddressChange.txt.gz s3://sbv-abr-etl/DIMENSION/BusAddressChange/date=${DATE_PARTITION}/BusAddressChange.txt.gz
 aws s3 cp EmailChange.txt.gz s3://sbv-abr-etl/DIMENSION/EmailChange/date=${DATE_PARTITION}/EmailChange.txt.gz
 aws s3 cp IndustryChange.txt.gz s3://sbv-abr-etl/DIMENSION/IndustryChange/date=${DATE_PARTITION}/IndustryChange.txt.gz
-
-# Copy current combined into parent folder for next run
-cp combined.txt ../previous-combine.txt

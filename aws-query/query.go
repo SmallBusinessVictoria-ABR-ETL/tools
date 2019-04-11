@@ -13,8 +13,10 @@ func main() {
 
 	data := struct {
 		Arg1 string
+		Arg2 string
 	}{
 		Arg1: os.Args[2],
+		Arg2: os.Args[3],
 	}
 
 	var sql bytes.Buffer
@@ -29,7 +31,7 @@ func main() {
 	}
 
 	fmt.Print(string(sql.Bytes()))
-	tools.Query(sql.String(), "s3://sbv-abr-etl/custom-extract/"+data.Arg1)
+	tools.Query(sql.String(), "s3://sbv-abr-etl/custom-extract/"+data.Arg1+"-"+data.Arg2)
 
 	//fmt.Print("\n-----\n\ns3://sbv-abr-etl/custom-extract/"+data.Arg1+".csv\n\n-----\n")
 }
