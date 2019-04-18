@@ -9,7 +9,7 @@
 
 ```bash
 export AWS_PROFILE=sbv
-export SBV_USER=jason.test
+export SBV_USER=jason.testa
 export SBV_TMP_PASS=sbv_temp_pass_010
 export SBV_GROUP=DataLake_DataEngineer
 
@@ -41,6 +41,5 @@ Password: sbv_temp_pass_010
 You will be required to set a password. Please ensure your password contains more then 8 characters and includes Capitals, Lowercase, Numbers and Symbols
 
 Kind Regards,
-Small Business Victoria - Data Lake Suppor
-
+Small Business Victoria - Data Lake Support
 ```

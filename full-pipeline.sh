@@ -17,20 +17,24 @@ export EXTRACT_DATE="`date +%Y%m%d`"
 export EXTRACT_DATE_SHORT="`date +%Y%m%d` | tail -c 7"
 export SBV_BUCKET="sbv-abr-etl"
 
+
+export EXTRACT_DATE=20190325
+export EXTRACT_DATE_SHORT=190325
+
 mkdir ${EXTRACT_DATE}
 cd ${EXTRACT_DATE}
 
 unzip ../${EXTRACT_DATE}-VIC_ABR_Extract.zip
 
-aws s3 cp VIC${EXTRACT_DATE_SHORT}_ABR_Agency_Data.txt s3://${SBV_BUCKET}/DATA/Agency_Data/Date/${EXTRACT_DATE}/ABR_Agency_Data.txt
-aws s3 cp VIC${EXTRACT_DATE_SHORT}_ABR_ACNC.txt s3://${SBV_BUCKET}/DATA/ACNC/Date/${EXTRACT_DATE}/ABR_ACNC.txt
-aws s3 cp VIC${EXTRACT_DATE_SHORT}_ABR_Associates.txt s3://${SBV_BUCKET}/DATA/Associates/Date/${EXTRACT_DATE}/ABR_Associates.txt
-aws s3 cp VIC${EXTRACT_DATE_SHORT}_ABR_Businesslocation.txt s3://${SBV_BUCKET}/DATA/Businesslocation/Date/${EXTRACT_DATE}/ABR_Businesslocation.txt
-aws s3 cp VIC${EXTRACT_DATE_SHORT}_ABR_Businessname.txt s3://${SBV_BUCKET}/DATA/Businessname/Date/${EXTRACT_DATE}/ABR_Businessname.txt
-aws s3 cp VIC${EXTRACT_DATE_SHORT}_ABR_Funds.txt s3://${SBV_BUCKET}/DATA/Funds/Date/${EXTRACT_DATE}/ABR_Funds.txt
-aws s3 cp VIC${EXTRACT_DATE_SHORT}_ABR_Othtrdnames.txt s3://${SBV_BUCKET}/DATA/Othtrdnames/Date/${EXTRACT_DATE}/ABR_Othtrdnames.txt
-aws s3 cp VIC${EXTRACT_DATE_SHORT}_ABR_Replacedabn.txt s3://${SBV_BUCKET}/DATA/Replacedabn/Date/${EXTRACT_DATE}/ABR_Replacedabn.txt
-aws s3 cp VIC${EXTRACT_DATE_SHORT}_ABR_Summary.txt s3://${SBV_BUCKET}/DATA/Summary/Date/${EXTRACT_DATE}/ABR_Summary.txt
+aws s3 cp VIC${EXTRACT_DATE_SHORT}_ABR_Agency_Data.txt s3://${SBV_BUCKET}/DATA/Agency_Data/importdate=${EXTRACT_DATE}/ABR_Agency_Data.txt
+aws s3 cp VIC${EXTRACT_DATE_SHORT}_ABR_ACNC.txt s3://${SBV_BUCKET}/DATA/ACNC/importdate=${EXTRACT_DATE}/ABR_ACNC.txt
+aws s3 cp VIC${EXTRACT_DATE_SHORT}_ABR_Associates.txt s3://${SBV_BUCKET}/DATA/Associates/importdate=${EXTRACT_DATE}/ABR_Associates.txt
+aws s3 cp VIC${EXTRACT_DATE_SHORT}_ABR_Businesslocation.txt s3://${SBV_BUCKET}/DATA/Businesslocation/importdate=${EXTRACT_DATE}/ABR_Businesslocation.txt
+aws s3 cp VIC${EXTRACT_DATE_SHORT}_ABR_Businessname.txt s3://${SBV_BUCKET}/DATA/Businessname/importdate=${EXTRACT_DATE}/ABR_Businessname.txt
+aws s3 cp VIC${EXTRACT_DATE_SHORT}_ABR_Funds.txt s3://${SBV_BUCKET}/DATA/Funds/importdate=${EXTRACT_DATE}/ABR_Funds.txt
+aws s3 cp VIC${EXTRACT_DATE_SHORT}_ABR_Othtrdnames.txt s3://${SBV_BUCKET}/DATA/Othtrdnames/importdate=${EXTRACT_DATE}/ABR_Othtrdnames.txt
+aws s3 cp VIC${EXTRACT_DATE_SHORT}_ABR_Replacedabn.txt s3://${SBV_BUCKET}/DATA/Replacedabn/importdate=${EXTRACT_DATE}/ABR_Replacedabn.txt
+aws s3 cp VIC${EXTRACT_DATE_SHORT}_ABR_Summary.txt s3://${SBV_BUCKET}/DATA/Summary/importdate=${EXTRACT_DATE}/ABR_Summary.txt
 
 # Diff, Convert to Parquet and Push to S3
 # bash ./doAllTheThings.sh

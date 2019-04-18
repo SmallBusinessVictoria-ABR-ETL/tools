@@ -6,15 +6,18 @@ import (
 	"github.com/SmallBusinessVictoria-ABR-ETL/tools"
 	"log"
 	"os"
+	"strings"
 	"text/template"
 )
 
 func main() {
 
 	data := struct {
+		Args []string
 		Arg1 string
 		Arg2 string
 	}{
+		Args: os.Args[2:],
 		Arg1: os.Args[2],
 		Arg2: os.Args[3],
 	}
