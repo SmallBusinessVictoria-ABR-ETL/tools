@@ -1,36 +1,38 @@
-SELECT n.pid, n.abn
-n.ent_typ_cd
-n.org_nm
-n.nm_titl_cd
-n.prsn_gvn_nm
-n.prsn_othr_gvn_nm
-n.prsn_fmly_nm
-n.nm_sufx_cd
-n.abn_regn_dt
-n.abn_cancn_dt
-n.mn_trdg_nm
-n.son_addr_ln_1
-n.son_addr_ln_2
-n.son_sbrb
-n.son_stt
-n.son_pc
-n.son_cntry_cd
-n.son_dpid
-n.mn_bus_addr_ln_1
-n.mn_bus_addr_ln_2
-n.mn_bus_sbrb
-n.mn_bus_stt
-n.mn_bus_pc
-n.mn_bus_cntry_cd
-n.mn_bus_dpid
-n.ent_eml
-n.prty_id_blnk
-n.gst_regn_dt
-n.gst_cancn_dt
-n.mn_indy_clsn
-n.mn_indy_clsn_descn
-n.acn
-n.sprsn_ind string
+SELECT n.pid,
+n.abn,
+n.ent_typ_cd,
+n.org_nm,
+n.nm_titl_cd,
+n.prsn_gvn_nm,
+n.prsn_othr_gvn_nm,
+n.prsn_fmly_nm,
+n.nm_sufx_cd,
+n.abn_regn_dt,
+n.abn_cancn_dt,
+n.mn_trdg_nm,
+n.son_addr_ln_1,
+n.son_addr_ln_2,
+n.son_sbrb,
+n.son_stt,
+n.son_pc,
+n.son_cntry_cd,
+n.son_dpid,
+n.mn_bus_addr_ln_1,
+n.mn_bus_addr_ln_2,
+n.mn_bus_sbrb,
+n.mn_bus_stt,
+n.mn_bus_pc,
+n.mn_bus_cntry_cd,
+n.mn_bus_dpid,
+n.ent_eml,
+n.prty_id_blnk,
+n.gst_regn_dt,
+n.gst_cancn_dt,
+n.mn_indy_clsn,
+n.mn_indy_clsn_descn,
+n.acn,
+n.sprsn_ind
+
 FROM abr_weekly_agency_data n
 JOIN abr_weekly_agency_data n2 on n.pid=n2.pid
 
